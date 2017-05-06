@@ -1,0 +1,18 @@
+/*
+ * Super Simple and Small 2D Platformer Game
+ */
+
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "outDir": "../"
+    },
+    
+    "compileOnSave": true,
+    "files": [
+        "game.ts",
+        "lib/phaser.d.ts",
+        "lib/p2.d.ts",
+        "lib/pixi.d.ts"
+    ]
+}

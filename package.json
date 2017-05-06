@@ -1,0 +1,13 @@
+{
+  "name": "Super_Simple_and_Small_2D_Platformer_Game",
+  "version": "0.0.1",
+  "keywords": [
+    "game",
+    "browser"
+  ],
+  "author": "Web D.va",
+  "contributors": [],
+  "dependencies": {
+    "phaser-ce": "^2.7.7"
+  }
+}
