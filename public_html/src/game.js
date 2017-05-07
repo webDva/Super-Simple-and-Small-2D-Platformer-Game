@@ -24,9 +24,8 @@ var SimpleGame = (function () {
         this.block.height = 32;
         this.game.physics.arcade.enable(this.block);
         this.block.body.bounce.y = 0.2;
-        this.block.body.gravity.y = 2000;
-        this.block.body.gravity.x = 20;
-        this.block.body.velocity.x = 100;
+        this.block.body.gravity.y = 1000;
+        this.block.body.collideWorldBounds = true;
         this.game.camera.follow(this.block);
         this.cursors = this.game.input.keyboard.createCursorKeys();
         this.map = this.game.add.tilemap("tilemap");
@@ -37,6 +36,16 @@ var SimpleGame = (function () {
     };
     SimpleGame.prototype.update = function () {
         this.game.physics.arcade.collide(this.block, this.platformLayer);
+        this.block.body.velocity.x = 0;
+        if (this.cursors.left.isDown) {
+            this.block.body.velocity.x = -150;
+        }
+        else if (this.cursors.right.isDown) {
+            this.block.body.velocity.x = 150;
+        }
+        if (this.cursors.up.isDown && this.block.body.onFloor()) {
+            this.block.body.velocity.y = -250;
+        }
     };
     SimpleGame.prototype.render = function () {
     };

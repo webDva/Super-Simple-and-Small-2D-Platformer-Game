@@ -7,7 +7,7 @@ class SimpleGame {
     game: Phaser.Game;
     block: Phaser.Sprite;
     logo: Phaser.Sprite;
-    
+
     cursors: Phaser.CursorKeys;
 
     // don't know if need these here
@@ -30,9 +30,9 @@ class SimpleGame {
     create() {
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
 
-//        this.logo = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'logo');
-//        this.logo.scale.s        etTo(0.2, 0.2);
-//        this.logo.anchor.setTo(0.5, 0.5);
+        //        this.logo = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'logo');
+        //        this.logo.scale.s        etTo(0.2, 0.2);
+        //        this.logo.anchor.setTo(0.5, 0.5);
 
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -40,16 +40,16 @@ class SimpleGame {
         this.block = this.game.add.sprite(0, 0, "block");
         this.block.width = 32;
         this.block.height = 32;
-        
+
         this.game.physics.arcade.enable(this.block);
-        
+
         this.block.body.bounce.y = 0.2;
-        this.block.body.gravity.y = 2000;
-        this.block.body.gravity.x = 20;
-        this.block.body.velocity.x = 100;
-        
+        this.block.body.gravity.y = 1000;
+
+        this.block.body.collideWorldBounds = true;
+
         this.game.camera.follow(this.block);
-        
+
         this.cursors = this.game.input.keyboard.createCursorKeys();
 
         this.map = this.game.add.tilemap("tilemap");
@@ -64,6 +64,21 @@ class SimpleGame {
 
     update() {
         this.game.physics.arcade.collide(this.block, this.platformLayer);
+
+        this.block.body.velocity.x = 0;
+
+        if (this.cursors.left.isDown) {
+            this.block.body.velocity.x = -150;
+
+        }
+        else if (this.cursors.right.isDown) {
+            this.block.body.velocity.x = 150;
+
+        }
+
+        if (this.cursors.up.isDown && this.block.body.onFloor()) {
+            this.block.body.velocity.y = -250;
+        }
     }
 
     render() {
