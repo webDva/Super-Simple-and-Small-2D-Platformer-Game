@@ -14,6 +14,11 @@ class SimpleGame {
     map: Phaser.Tilemap;
     platformLayer: Phaser.TilemapLayer;
 
+    // CONSTANTS
+    static GRAVITY: number = 1000;
+    static MOVE_VELOCITY: number = 400;
+    static JUMP_VELOCITY: number = SimpleGame.MOVE_VELOCITY + SimpleGame.MOVE_VELOCITY * 0.55;
+
     constructor() {
         this.game = new Phaser.Game(800, 600, Phaser.AUTO, "phaser", {preload: this.preload, create: this.create, update: this.update, render: this.render});
     }
@@ -30,10 +35,6 @@ class SimpleGame {
     create() {
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
 
-        //        this.logo = this.game.add.sprite(this.game.world.centerX, this.game.world.centerY, 'logo');
-        //        this.logo.scale.s        etTo(0.2, 0.2);
-        //        this.logo.anchor.setTo(0.5, 0.5);
-
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
         // add red block to represent player
@@ -44,7 +45,7 @@ class SimpleGame {
         this.game.physics.arcade.enable(this.block);
 
         this.block.body.bounce.y = 0.2;
-        this.block.body.gravity.y = 1000;
+        this.block.body.gravity.y = SimpleGame.GRAVITY;
 
         this.block.body.collideWorldBounds = true;
 
@@ -68,16 +69,16 @@ class SimpleGame {
         this.block.body.velocity.x = 0;
 
         if (this.cursors.left.isDown) {
-            this.block.body.velocity.x = -150;
+            this.block.body.velocity.x = -SimpleGame.MOVE_VELOCITY;
 
         }
         else if (this.cursors.right.isDown) {
-            this.block.body.velocity.x = 150;
+            this.block.body.velocity.x = SimpleGame.MOVE_VELOCITY;
 
         }
 
         if (this.cursors.up.isDown && this.block.body.onFloor()) {
-            this.block.body.velocity.y = -250;
+            this.block.body.velocity.y = -SimpleGame.JUMP_VELOCITY;
         }
     }
 
