@@ -78,7 +78,7 @@ class SimpleGame {
 
         this.map.setCollisionBetween(1, 10000, true, this.platformLayer);
 
-        this.platformLayer.resizeWorld
+        this.platformLayer.resizeWorld();
 
         // add controls to the screen (should add code for determining if player is on desktop or mobile)
         this.aButton = this.game.add.button(525, 430, "aButton", null, this);
