@@ -73,14 +73,14 @@
  "tileheight":32,
  "tilesets":[
         {
-         "columns":2,
+         "columns":1,
          "firstgid":1,
          "image":"spritesheet.png",
-         "imageheight":34,
-         "imagewidth":68,
+         "imageheight":66,
+         "imagewidth":32,
          "margin":0,
          "name":"blocks",
-         "spacing":1,
+         "spacing":2,
          "tilecount":2,
          "tileheight":32,
          "tileproperties":
