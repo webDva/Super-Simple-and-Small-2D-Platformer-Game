@@ -14,6 +14,18 @@ class SimpleGame {
     map: Phaser.Tilemap;
     platformLayer: Phaser.TilemapLayer;
 
+    // onscreen controls sprites
+    aButton: Phaser.Button;
+    bButton: Phaser.Button;
+    leftButton: Phaser.Button;
+    rightButton: Phaser.Button;
+
+    // booleans for button holding
+    isAButtonPressed: boolean;
+    isBButtonPressed: boolean;
+    isLeftButtonPressed: boolean;
+    isRightButtonPressed: boolean;
+
     // CONSTANTS
     static GRAVITY: number = 1000;
     static MOVE_VELOCITY: number = 400;
@@ -30,6 +42,12 @@ class SimpleGame {
         // loading tilemap stuff
         this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
         this.game.load.image("tiles", "assets/spritesheet.png"); // tile spritesheet 
+
+        // load sprites for the onscreen controller
+        this.game.load.image("aButton", "assets/controls/abutton.png");
+        this.game.load.image("bButton", "assets/controls/bbutton.png");
+        this.game.load.image("leftButton", "assets/controls/leftarrow.png");
+        this.game.load.image("rightButton", "assets/controls/rightarrow.png");
     }
 
     create() {
@@ -60,7 +78,38 @@ class SimpleGame {
 
         this.map.setCollisionBetween(1, 10000, true, this.platformLayer);
 
-        this.platformLayer.resizeWorld();
+        this.platformLayer.resizeWorld
+
+        // add controls to the screen (should add code for determining if player is on desktop or mobile)
+        this.aButton = this.game.add.button(525, 430, "aButton", null, this);
+        this.aButton.fixedToCamera = true; // stay in one place like a UI button
+        this.aButton.events.onInputDown.add(() => {
+            this.isAButtonPressed = true;
+        });
+        this.aButton.events.onInputUp.add(() => {
+            this.isAButtonPressed = false;
+        });
+
+        this.bButton = this.game.add.button(640, 350, "bButton", null, this);
+        this.bButton.fixedToCamera = true;
+
+        this.leftButton = this.game.add.button(40, 380, "leftButton", null, this);
+        this.leftButton.fixedToCamera = true;
+        this.leftButton.events.onInputDown.add(() => {
+            this.isLeftButtonPressed = true;
+        });
+        this.leftButton.events.onInputUp.add(() => {
+            this.isLeftButtonPressed = false;
+        });
+
+        this.rightButton = this.game.add.button(180, 380, "rightButton", null, this);
+        this.rightButton.fixedToCamera = true;
+        this.rightButton.events.onInputDown.add(() => {
+            this.isRightButtonPressed = true;
+        });
+        this.rightButton.events.onInputUp.add(() => {
+            this.isRightButtonPressed = false;
+        });
     }
 
     update() {
@@ -68,16 +117,14 @@ class SimpleGame {
 
         this.block.body.velocity.x = 0;
 
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown || this.isLeftButtonPressed) {
             this.block.body.velocity.x = -SimpleGame.MOVE_VELOCITY;
-
         }
-        else if (this.cursors.right.isDown) {
+        else if (this.cursors.right.isDown || this.isRightButtonPressed) {
             this.block.body.velocity.x = SimpleGame.MOVE_VELOCITY;
-
         }
 
-        if (this.cursors.up.isDown && this.block.body.onFloor()) {
+        if ((this.cursors.up.isDown || this.isAButtonPressed) && this.block.body.onFloor()) {
             this.block.body.velocity.y = -SimpleGame.JUMP_VELOCITY;
         }
     }

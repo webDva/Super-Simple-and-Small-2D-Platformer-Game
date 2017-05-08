@@ -11,8 +11,14 @@ var SimpleGame = (function () {
         // loading tilemap stuff
         this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
         this.game.load.image("tiles", "assets/spritesheet.png"); // tile spritesheet 
+        // load sprites for the onscreen controller
+        this.game.load.image("aButton", "assets/controls/abutton.png");
+        this.game.load.image("bButton", "assets/controls/bbutton.png");
+        this.game.load.image("leftButton", "assets/controls/leftarrow.png");
+        this.game.load.image("rightButton", "assets/controls/rightarrow.png");
     };
     SimpleGame.prototype.create = function () {
+        var _this = this;
         this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
         // add red block to represent player
@@ -29,18 +35,45 @@ var SimpleGame = (function () {
         this.map.addTilesetImage("blocks", "tiles");
         this.platformLayer = this.map.createLayer("platform");
         this.map.setCollisionBetween(1, 10000, true, this.platformLayer);
-        this.platformLayer.resizeWorld();
+        this.platformLayer.resizeWorld;
+        // add controls to the screen (should add code for determining if player is on desktop or mobile)
+        this.aButton = this.game.add.button(525, 430, "aButton", null, this);
+        this.aButton.fixedToCamera = true; // stay in one place like a UI button
+        this.aButton.events.onInputDown.add(function () {
+            _this.isAButtonPressed = true;
+        });
+        this.aButton.events.onInputUp.add(function () {
+            _this.isAButtonPressed = false;
+        });
+        this.bButton = this.game.add.button(640, 350, "bButton", null, this);
+        this.bButton.fixedToCamera = true;
+        this.leftButton = this.game.add.button(40, 380, "leftButton", null, this);
+        this.leftButton.fixedToCamera = true;
+        this.leftButton.events.onInputDown.add(function () {
+            _this.isLeftButtonPressed = true;
+        });
+        this.leftButton.events.onInputUp.add(function () {
+            _this.isLeftButtonPressed = false;
+        });
+        this.rightButton = this.game.add.button(180, 380, "rightButton", null, this);
+        this.rightButton.fixedToCamera = true;
+        this.rightButton.events.onInputDown.add(function () {
+            _this.isRightButtonPressed = true;
+        });
+        this.rightButton.events.onInputUp.add(function () {
+            _this.isRightButtonPressed = false;
+        });
     };
     SimpleGame.prototype.update = function () {
         this.game.physics.arcade.collide(this.block, this.platformLayer);
         this.block.body.velocity.x = 0;
-        if (this.cursors.left.isDown) {
+        if (this.cursors.left.isDown || this.isLeftButtonPressed) {
             this.block.body.velocity.x = -SimpleGame.MOVE_VELOCITY;
         }
-        else if (this.cursors.right.isDown) {
+        else if (this.cursors.right.isDown || this.isRightButtonPressed) {
             this.block.body.velocity.x = SimpleGame.MOVE_VELOCITY;
         }
-        if (this.cursors.up.isDown && this.block.body.onFloor()) {
+        if ((this.cursors.up.isDown || this.isAButtonPressed) && this.block.body.onFloor()) {
             this.block.body.velocity.y = -SimpleGame.JUMP_VELOCITY;
         }
     };
