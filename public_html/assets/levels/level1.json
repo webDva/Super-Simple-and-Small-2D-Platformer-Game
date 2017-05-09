@@ -23,13 +23,11 @@
                  "name":"collectible2",
                  "properties":
                     {
-                     "group":"collectibles",
-                     "texture":"collectible_spritesheet"
+                     "group":"collectibles"
                     },
                  "propertytypes":
                     {
-                     "group":"string",
-                     "texture":"string"
+                     "group":"string"
                     },
                  "rotation":0,
                  "type":"collectible",
@@ -45,13 +43,11 @@
                  "name":"collectible1",
                  "properties":
                     {
-                     "group":"collectibles",
-                     "texture":"collectible_spritesheet"
+                     "group":"collectibles"
                     },
                  "propertytypes":
                     {
-                     "group":"string",
-                     "texture":"string"
+                     "group":"string"
                     },
                  "rotation":0,
                  "type":"collectible",
