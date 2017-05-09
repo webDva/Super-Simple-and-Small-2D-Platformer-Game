@@ -40,31 +40,33 @@ var SimpleGame = (function () {
         this.collectibles.enableBody = true;
         // create sprites for all objects in collectibles group layer
         this.map.createFromObjects("collectibles", 1, "tiles", 0, true, false, this.collectibles);
-        // add controls to the screen (should add code for determining if player is on desktop or mobile)
-        this.aButton = this.game.add.button(525, 430, "aButton", null, this);
-        this.aButton.fixedToCamera = true; // stay in one place like a UI button
-        this.aButton.events.onInputDown.add(function () {
-            _this.isAButtonPressed = true;
-        });
-        this.aButton.events.onInputUp.add(function () {
-            _this.isAButtonPressed = false;
-        });
-        this.leftButton = this.game.add.button(40, 380, "leftButton", null, this);
-        this.leftButton.fixedToCamera = true;
-        this.leftButton.events.onInputDown.add(function () {
-            _this.isLeftButtonPressed = true;
-        });
-        this.leftButton.events.onInputUp.add(function () {
-            _this.isLeftButtonPressed = false;
-        });
-        this.rightButton = this.game.add.button(180, 380, "rightButton", null, this);
-        this.rightButton.fixedToCamera = true;
-        this.rightButton.events.onInputDown.add(function () {
-            _this.isRightButtonPressed = true;
-        });
-        this.rightButton.events.onInputUp.add(function () {
-            _this.isRightButtonPressed = false;
-        });
+        // add oncscreen controls to the screen, but only if touch is available
+        if (this.game.device.touch) {
+            this.aButton = this.game.add.button(630, 390, "aButton", null, this);
+            this.aButton.fixedToCamera = true; // stay in one place like a UI button
+            this.aButton.events.onInputDown.add(function () {
+                _this.isAButtonPressed = true;
+            });
+            this.aButton.events.onInputUp.add(function () {
+                _this.isAButtonPressed = false;
+            });
+            this.leftButton = this.game.add.button(40, 380, "leftButton", null, this);
+            this.leftButton.fixedToCamera = true;
+            this.leftButton.events.onInputDown.add(function () {
+                _this.isLeftButtonPressed = true;
+            });
+            this.leftButton.events.onInputUp.add(function () {
+                _this.isLeftButtonPressed = false;
+            });
+            this.rightButton = this.game.add.button(180, 380, "rightButton", null, this);
+            this.rightButton.fixedToCamera = true;
+            this.rightButton.events.onInputDown.add(function () {
+                _this.isRightButtonPressed = true;
+            });
+            this.rightButton.events.onInputUp.add(function () {
+                _this.isRightButtonPressed = false;
+            });
+        }
         // start gamepad controls
         this.game.input.gamepad.start();
         this.pad1 = this.game.input.gamepad.pad1;
