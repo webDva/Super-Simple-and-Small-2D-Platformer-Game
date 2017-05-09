@@ -42,7 +42,7 @@ class SimpleGame {
 
         // loading tilemap stuff
         this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
-        this.game.load.spritesheet("tiles", "assets/spritesheet.png", 32, 32); // tile spritesheet 
+        this.game.load.spritesheet("tiles", "assets/levels/spritesheet.png", 32, 32); // tile spritesheet 
 
         // load sprites for the onscreen controller
         this.game.load.image("aButton", "assets/controls/abutton.png");
