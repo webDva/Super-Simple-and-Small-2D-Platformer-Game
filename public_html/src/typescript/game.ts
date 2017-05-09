@@ -10,9 +10,10 @@ class SimpleGame {
 
     cursors: Phaser.CursorKeys;
 
-    // don't know if need these here
+    // tiled map stuff
     map: Phaser.Tilemap;
     platformLayer: Phaser.TilemapLayer;
+    collectibles: Phaser.Group;
 
     // onscreen controls sprites
     aButton: Phaser.Button;
@@ -41,11 +42,10 @@ class SimpleGame {
 
         // loading tilemap stuff
         this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
-        this.game.load.image("tiles", "assets/spritesheet.png"); // tile spritesheet 
+        this.game.load.spritesheet("tiles", "assets/levels/spritesheet.png", 32, 32); // tile spritesheet 
 
         // load sprites for the onscreen controller
         this.game.load.image("aButton", "assets/controls/abutton.png");
-        this.game.load.image("bButton", "assets/controls/bbutton.png");
         this.game.load.image("leftButton", "assets/controls/leftarrow.png");
         this.game.load.image("rightButton", "assets/controls/rightarrow.png");
     }
@@ -80,6 +80,13 @@ class SimpleGame {
 
         this.platformLayer.resizeWorld();
 
+        // add collectibles to the game
+        this.collectibles = this.game.add.group();
+        this.collectibles.enableBody = true;
+
+        // create sprites for all objects in collectibles group layer
+        this.map.createFromObjects("collectibles", 1, "tiles", 0, true, false, this.collectibles);
+
         // add controls to the screen (should add code for determining if player is on desktop or mobile)
         this.aButton = this.game.add.button(525, 430, "aButton", null, this);
         this.aButton.fixedToCamera = true; // stay in one place like a UI button
@@ -89,9 +96,6 @@ class SimpleGame {
         this.aButton.events.onInputUp.add(() => {
             this.isAButtonPressed = false;
         });
-
-        this.bButton = this.game.add.button(640, 350, "bButton", null, this);
-        this.bButton.fixedToCamera = true;
 
         this.leftButton = this.game.add.button(40, 380, "leftButton", null, this);
         this.leftButton.fixedToCamera = true;
@@ -114,6 +118,9 @@ class SimpleGame {
 
     update() {
         this.game.physics.arcade.collide(this.block, this.platformLayer);
+        this.game.physics.arcade.overlap(this.block, this.collectibles, (player: Phaser.Sprite, collectible: Phaser.Sprite) => {
+            collectible.kill();
+        }, null, this);
 
         this.block.body.velocity.x = 0;
 
