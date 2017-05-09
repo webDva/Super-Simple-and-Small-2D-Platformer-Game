@@ -13,7 +13,6 @@ var SimpleGame = (function () {
         this.game.load.image("tiles", "assets/spritesheet.png"); // tile spritesheet 
         // load sprites for the onscreen controller
         this.game.load.image("aButton", "assets/controls/abutton.png");
-        this.game.load.image("bButton", "assets/controls/bbutton.png");
         this.game.load.image("leftButton", "assets/controls/leftarrow.png");
         this.game.load.image("rightButton", "assets/controls/rightarrow.png");
     };
@@ -45,8 +44,6 @@ var SimpleGame = (function () {
         this.aButton.events.onInputUp.add(function () {
             _this.isAButtonPressed = false;
         });
-        this.bButton = this.game.add.button(640, 350, "bButton", null, this);
-        this.bButton.fixedToCamera = true;
         this.leftButton = this.game.add.button(40, 380, "leftButton", null, this);
         this.leftButton.fixedToCamera = true;
         this.leftButton.events.onInputDown.add(function () {
