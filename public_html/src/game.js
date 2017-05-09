@@ -65,6 +65,9 @@ var SimpleGame = (function () {
         this.rightButton.events.onInputUp.add(function () {
             _this.isRightButtonPressed = false;
         });
+        // start gamepad controls
+        this.game.input.gamepad.start();
+        this.pad1 = this.game.input.gamepad.pad1;
     };
     SimpleGame.prototype.update = function () {
         this.game.physics.arcade.collide(this.block, this.platformLayer);
@@ -80,6 +83,18 @@ var SimpleGame = (function () {
         }
         if ((this.cursors.up.isDown || this.isAButtonPressed) && this.block.body.onFloor()) {
             this.block.body.velocity.y = -SimpleGame.JUMP_VELOCITY;
+        }
+        // listening for gamepad input        
+        if (this.game.input.gamepad.supported && this.game.input.gamepad.active && this.pad1.connected) {
+            if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
+                this.block.body.velocity.x = -SimpleGame.MOVE_VELOCITY;
+            }
+            else if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
+                this.block.body.velocity.x = SimpleGame.MOVE_VELOCITY;
+            }
+            if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A) && this.block.body.onFloor()) {
+                this.block.body.velocity.y = -SimpleGame.JUMP_VELOCITY;
+            }
         }
     };
     SimpleGame.prototype.render = function () {

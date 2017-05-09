@@ -27,6 +27,9 @@ class SimpleGame {
     isLeftButtonPressed: boolean;
     isRightButtonPressed: boolean;
 
+    // only one gamepad
+    pad1: Phaser.SinglePad;
+
     // CONSTANTS
     static GRAVITY: number = 1000;
     static MOVE_VELOCITY: number = 400;
@@ -114,6 +117,10 @@ class SimpleGame {
         this.rightButton.events.onInputUp.add(() => {
             this.isRightButtonPressed = false;
         });
+
+        // start gamepad controls
+        this.game.input.gamepad.start();
+        this.pad1 = this.game.input.gamepad.pad1;
     }
 
     update() {
@@ -133,6 +140,21 @@ class SimpleGame {
 
         if ((this.cursors.up.isDown || this.isAButtonPressed) && this.block.body.onFloor()) {
             this.block.body.velocity.y = -SimpleGame.JUMP_VELOCITY;
+        }
+
+        // listening for gamepad input        
+        if (this.game.input.gamepad.supported && this.game.input.gamepad.active && this.pad1.connected) {
+            if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
+                this.block.body.velocity.x = -SimpleGame.MOVE_VELOCITY;
+            }
+
+            else if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
+                this.block.body.velocity.x = SimpleGame.MOVE_VELOCITY;
+            }
+
+            if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A) && this.block.body.onFloor()) {
+                this.block.body.velocity.y = -SimpleGame.JUMP_VELOCITY;
+            }
         }
     }
 
