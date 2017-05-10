@@ -30,6 +30,9 @@ var PlatformerGame;
         GameState.prototype.create = function () {
             var _this = this;
             this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
+            // setting the background color
+            this.game.stage.backgroundColor = "#312341";
+            // just using arcade physics for Super Simple Platformer for now
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
             // player avatar
             this.player = this.game.add.sprite(0, 0, "player");
