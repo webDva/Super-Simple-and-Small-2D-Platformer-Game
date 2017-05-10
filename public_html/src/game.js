@@ -21,7 +21,7 @@ var PlatformerGame;
             this.game.load.image('logo', 'assets/pantsuweb2.png');
             // loading tilemap stuff
             this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
-            this.game.load.spritesheet("tiles", "assets/levels/spritesheet.png", 32, 32); // tile spritesheet 
+            this.game.load.spritesheet("tilesheet", "assets/levels/tile_spritesheet.png", 32, 32); // tile spritesheet 
             // load sprites for the onscreen controller
             this.game.load.image("aButton", "assets/controls/abutton.png");
             this.game.load.image("leftButton", "assets/controls/leftarrow.png");
@@ -44,16 +44,19 @@ var PlatformerGame;
             this.cursors = this.game.input.keyboard.createCursorKeys();
             // add tiled map
             this.map = this.game.add.tilemap("tilemap");
-            this.map.addTilesetImage("blocks", "tiles");
-            // add platform layer to the game
+            this.map.addTilesetImage("tiles", "tilesheet");
+            // add platform layer and hazards layer to the game
             this.platformLayer = this.map.createLayer("platform");
-            this.map.setCollisionBetween(1, 10000, true, this.platformLayer); // got to do something about that arbitrary 10000
+            this.hazardsLayer = this.map.createLayer("hazards");
+            // setting collision between player and layers
+            this.map.setCollisionByExclusion([], true, this.platformLayer);
+            this.map.setCollisionByExclusion([], true, this.hazardsLayer);
             this.platformLayer.resizeWorld(); // resize the world to the size of the platform layer
             // add collectibles to the game
             this.collectibles = this.game.add.group();
             this.collectibles.enableBody = true;
             // create sprites for all objects in collectibles group layer
-            this.map.createFromObjects("collectibles", 1, "tiles", 0, true, false, this.collectibles);
+            this.map.createFromObjects("collectibles", 1, "tilesheet", 0, true, false, this.collectibles);
             // add oncscreen controls to the screen, but only if touch is available
             if (this.game.device.touch) {
                 this.aButton = this.game.add.button(630, 390, "aButton", null, this);
@@ -86,7 +89,12 @@ var PlatformerGame;
             this.pad1 = this.game.input.gamepad.pad1;
         };
         GameState.prototype.update = function () {
+            // collisions for the player avatar
             this.game.physics.arcade.collide(this.player, this.platformLayer); // player collides with platform layer tiles
+            this.game.physics.arcade.collide(this.player, this.hazardsLayer, function (player) {
+                // for now, just make the player jump really high when they collide with a hazard
+                player.body.velocity.y = -GameState.JUMP_VELOCITY * 10;
+            }, null, this);
             this.game.physics.arcade.overlap(this.player, this.collectibles, function (player, collectible) {
                 collectible.kill();
             }, null, this);
