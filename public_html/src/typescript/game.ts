@@ -11,7 +11,7 @@ module PlatformerGame {
         game: Phaser.Game;
 
         // sprites
-        block: Phaser.Sprite;
+        player: Phaser.Sprite;
         logo: Phaser.Sprite;
 
         // keyboard cursor key controls
@@ -47,7 +47,7 @@ module PlatformerGame {
         }
 
         preload() {
-            this.game.load.image('block', 'assets/placeholder.png'); // will use for the player object
+            this.game.load.image('player', 'assets/player.png');
             this.game.load.image('logo', 'assets/pantsuweb2.png');
 
             // loading tilemap stuff
@@ -65,15 +65,15 @@ module PlatformerGame {
 
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
-            // add red block to represent player
-            this.block = this.game.add.sprite(0, 0, "block");
-            this.block.width = 32;
-            this.block.height = 32;
-            this.game.physics.arcade.enable(this.block);
-            this.block.body.bounce.y = 0.2;
-            this.block.body.gravity.y = GameState.GRAVITY;
-            this.block.body.collideWorldBounds = true;
-            this.game.camera.follow(this.block); // make camera follow player
+            // player avatar
+            this.player = this.game.add.sprite(0, 0, "player");
+            this.player.width = 32;
+            this.player.height = 50;
+            this.game.physics.arcade.enable(this.player);
+            this.player.body.bounce.y = 0.2;
+            this.player.body.gravity.y = GameState.GRAVITY;
+            this.player.body.collideWorldBounds = true;
+            this.game.camera.follow(this.player); // make camera follow player
 
             // add cursor keys controls
             this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -132,35 +132,35 @@ module PlatformerGame {
         }
 
         update() {
-            this.game.physics.arcade.collide(this.block, this.platformLayer); // player collides with platform layer tiles
-            this.game.physics.arcade.overlap(this.block, this.collectibles, (player: Phaser.Sprite, collectible: Phaser.Sprite) => {
+            this.game.physics.arcade.collide(this.player, this.platformLayer); // player collides with platform layer tiles
+            this.game.physics.arcade.overlap(this.player, this.collectibles, (player: Phaser.Sprite, collectible: Phaser.Sprite) => {
                 collectible.kill();
             }, null, this);
 
             // reset the player's avatar's velocity so it won't move forever
-            this.block.body.velocity.x = 0;
+            this.player.body.velocity.x = 0;
 
             // processing cursor keys or onscreen controls input to move the player avatar
             if (this.cursors.left.isDown || this.isLeftButtonPressed) {
-                this.block.body.velocity.x = -GameState.MOVE_VELOCITY;
+                this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
             }
             else if (this.cursors.right.isDown || this.isRightButtonPressed) {
-                this.block.body.velocity.x = GameState.MOVE_VELOCITY;
+                this.player.body.velocity.x = GameState.MOVE_VELOCITY;
             }
-            if ((this.cursors.up.isDown || this.isAButtonPressed) && this.block.body.onFloor()) {
-                this.block.body.velocity.y = -GameState.JUMP_VELOCITY;
+            if ((this.cursors.up.isDown || this.isAButtonPressed) && this.player.body.onFloor()) {
+                this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
             }
 
             // listening for gamepad controller input        
             if (this.game.input.gamepad.supported && this.game.input.gamepad.active && this.pad1.connected) {
                 if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
-                    this.block.body.velocity.x = -GameState.MOVE_VELOCITY;
+                    this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
                 }
                 else if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
-                    this.block.body.velocity.x = GameState.MOVE_VELOCITY;
+                    this.player.body.velocity.x = GameState.MOVE_VELOCITY;
                 }
-                if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A) && this.block.body.onFloor()) {
-                    this.block.body.velocity.y = -GameState.JUMP_VELOCITY;
+                if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A) && this.player.body.onFloor()) {
+                    this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
                 }
             }
         }
