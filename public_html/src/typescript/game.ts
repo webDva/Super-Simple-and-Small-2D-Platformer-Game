@@ -178,6 +178,10 @@ module PlatformerGame {
 
             // add game states to the Phaser.Game
             this.game.state.add("GameState", GameState, false);
+            /* create two new states: a boot and preloader
+             * the boot state will contain an init for the scale manager and will load the loading screen,
+             * while the preloader will display the loading screen and load assets and then start the next state 
+             */
 
             // start the first state
             this.game.state.start("GameState", true, true);
