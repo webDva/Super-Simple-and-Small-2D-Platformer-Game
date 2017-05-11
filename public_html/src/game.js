@@ -17,7 +17,7 @@ var PlatformerGame;
             return _super.call(this) || this;
         }
         GameState.prototype.preload = function () {
-            this.game.load.image('player', 'assets/player.png');
+            this.game.load.image('player', 'assets/player_avatar.png');
             this.game.load.image('logo', 'assets/pantsuweb2.png');
             // loading tilemap stuff
             this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
@@ -36,8 +36,6 @@ var PlatformerGame;
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
             // player avatar
             this.player = this.game.add.sprite(0, 0, "player");
-            this.player.width = 32;
-            this.player.height = 50;
             this.game.physics.arcade.enable(this.player);
             this.player.body.bounce.y = 0.2;
             this.player.body.gravity.y = GameState.GRAVITY;
