@@ -14,6 +14,9 @@ module PlatformerGame {
         player: Phaser.Sprite;
         logo: Phaser.Sprite;
 
+        // sounds
+        jumpSound: Phaser.Sound;
+
         // keyboard cursor key controls
         cursors: Phaser.CursorKeys;
 
@@ -61,10 +64,16 @@ module PlatformerGame {
             this.game.load.image("aButton", "assets/controls/abutton.png");
             this.game.load.image("leftButton", "assets/controls/leftarrow.png");
             this.game.load.image("rightButton", "assets/controls/rightarrow.png");
+
+            // load sound
+            this.game.load.audio("jump_sound", "assets/jump.wav");
         }
 
         create() {
             this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
+
+            // add jump sound
+            this.jumpSound = this.game.add.audio("jump_sound");
 
             // setting the background color
             this.game.stage.backgroundColor = "#312341";
@@ -146,6 +155,16 @@ module PlatformerGame {
             this.pad1 = this.game.input.gamepad.pad1;
         }
 
+        /*
+         * checks to see if the player is on the ground, then jumps and plays jumping sound
+         */
+        makePlayerJump() {
+            if (this.player.body.onFloor()) {
+                this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
+                this.jumpSound.play();
+            }
+        }
+
         update() {
             // collisions for the player avatar
             this.game.physics.arcade.collide(this.player, this.platformLayer); // player collides with platform layer tiles
@@ -167,8 +186,8 @@ module PlatformerGame {
             else if (this.cursors.right.isDown || this.isRightButtonPressed) {
                 this.player.body.velocity.x = GameState.MOVE_VELOCITY;
             }
-            if ((this.cursors.up.isDown || this.isAButtonPressed) && this.player.body.onFloor()) {
-                this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
+            if (this.cursors.up.isDown || this.isAButtonPressed) {
+                this.makePlayerJump();
             }
 
             // listening for gamepad controller input        
@@ -179,8 +198,8 @@ module PlatformerGame {
                 else if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
                     this.player.body.velocity.x = GameState.MOVE_VELOCITY;
                 }
-                if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A) && this.player.body.onFloor()) {
-                    this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
+                if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A)) {
+                    this.makePlayerJump();
                 }
             }
         }
