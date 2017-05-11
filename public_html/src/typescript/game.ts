@@ -55,6 +55,7 @@ module PlatformerGame {
             // loading tilemap stuff
             this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
             this.game.load.spritesheet("tilesheet", "assets/levels/tile_spritesheet.png", 32, 32); // tile spritesheet 
+            this.game.load.spritesheet("collectibles_animations", "assets/levels/collectibles_animations.png", 32, 32);
 
             // load sprites for the onscreen controller
             this.game.load.image("aButton", "assets/controls/abutton.png");
@@ -101,7 +102,11 @@ module PlatformerGame {
             this.collectibles.enableBody = true;
 
             // create sprites for all objects in collectibles group layer
-            this.map.createFromObjects("collectibles", 1, "tilesheet", 0, true, false, this.collectibles);
+            this.map.createFromObjects("collectibles", 1, "collectibles_animations", 0, true, false, this.collectibles);
+
+            // add animations to the collectibles
+            this.collectibles.callAll("animations.add", "animations", "hover", [0, 1, 2, 1], 5, true);
+            this.collectibles.callAll("animations.play", "animations", "hover");
 
             // add oncscreen controls to the screen, but only if touch is available
             if (this.game.device.touch) {
