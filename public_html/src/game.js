@@ -62,6 +62,7 @@ var PlatformerGame;
             if (this.game.device.touch) {
                 this.aButton = this.game.add.button(630, 390, "aButton", null, this);
                 this.aButton.fixedToCamera = true; // stay in one place like a UI button
+                this.aButton.alpha = GameState.CONTROLS_ALPHA_VALUE; // set transparency
                 this.aButton.events.onInputDown.add(function () {
                     _this.isAButtonPressed = true;
                 });
@@ -70,6 +71,7 @@ var PlatformerGame;
                 });
                 this.leftButton = this.game.add.button(40, 380, "leftButton", null, this);
                 this.leftButton.fixedToCamera = true;
+                this.leftButton.alpha = GameState.CONTROLS_ALPHA_VALUE;
                 this.leftButton.events.onInputDown.add(function () {
                     _this.isLeftButtonPressed = true;
                 });
@@ -78,6 +80,7 @@ var PlatformerGame;
                 });
                 this.rightButton = this.game.add.button(180, 380, "rightButton", null, this);
                 this.rightButton.fixedToCamera = true;
+                this.rightButton.alpha = GameState.CONTROLS_ALPHA_VALUE;
                 this.rightButton.events.onInputDown.add(function () {
                     _this.isRightButtonPressed = true;
                 });
@@ -132,6 +135,7 @@ var PlatformerGame;
     GameState.GRAVITY = 1000;
     GameState.MOVE_VELOCITY = 400;
     GameState.JUMP_VELOCITY = GameState.MOVE_VELOCITY + GameState.MOVE_VELOCITY * 0.55;
+    GameState.CONTROLS_ALPHA_VALUE = 0.4;
     PlatformerGame.GameState = GameState;
     var Game = (function () {
         function Game() {

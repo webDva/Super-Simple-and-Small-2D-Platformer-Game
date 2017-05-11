@@ -42,6 +42,7 @@ module PlatformerGame {
         static GRAVITY: number = 1000;
         static MOVE_VELOCITY: number = 400;
         static JUMP_VELOCITY: number = GameState.MOVE_VELOCITY + GameState.MOVE_VELOCITY * 0.55;
+        static CONTROLS_ALPHA_VALUE: number = 0.4;
 
         constructor() {
             super();
@@ -106,6 +107,7 @@ module PlatformerGame {
             if (this.game.device.touch) {
                 this.aButton = this.game.add.button(630, 390, "aButton", null, this);
                 this.aButton.fixedToCamera = true; // stay in one place like a UI button
+                this.aButton.alpha = GameState.CONTROLS_ALPHA_VALUE; // set transparency
                 this.aButton.events.onInputDown.add(() => {
                     this.isAButtonPressed = true;
                 });
@@ -115,6 +117,7 @@ module PlatformerGame {
 
                 this.leftButton = this.game.add.button(40, 380, "leftButton", null, this);
                 this.leftButton.fixedToCamera = true;
+                this.leftButton.alpha = GameState.CONTROLS_ALPHA_VALUE;
                 this.leftButton.events.onInputDown.add(() => {
                     this.isLeftButtonPressed = true;
                 });
@@ -124,6 +127,7 @@ module PlatformerGame {
 
                 this.rightButton = this.game.add.button(180, 380, "rightButton", null, this);
                 this.rightButton.fixedToCamera = true;
+                this.rightButton.alpha = GameState.CONTROLS_ALPHA_VALUE;
                 this.rightButton.events.onInputDown.add(() => {
                     this.isRightButtonPressed = true;
                 });
