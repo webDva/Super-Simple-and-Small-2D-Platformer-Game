@@ -16,6 +16,7 @@ module PlatformerGame {
 
         // sounds
         jumpSound: Phaser.Sound;
+        collectSound: Phaser.Sound;
 
         // keyboard cursor key controls
         cursors: Phaser.CursorKeys;
@@ -66,14 +67,16 @@ module PlatformerGame {
             this.game.load.image("rightButton", "assets/controls/rightarrow.png");
 
             // load sound
-            this.game.load.audio("jump_sound", "assets/jump.wav");
+            this.game.load.audio("jump_sound", "assets/sounds/jump.wav");
+            this.game.load.audio("collect_sound", "assets/sounds/collect.wav");
         }
 
         create() {
             this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
 
-            // add jump sound
+            // add sounds
             this.jumpSound = this.game.add.audio("jump_sound");
+            this.collectSound = this.game.add.audio("collect_sound");
 
             // setting the background color
             this.game.stage.backgroundColor = "#312341";
@@ -165,6 +168,12 @@ module PlatformerGame {
             }
         }
 
+        collectibleOverlapCallback(player: Phaser.Sprite, collectible: Phaser.Sprite) {
+            // just kill the collectibles for now
+            collectible.kill();
+            this.collectSound.play();
+        }
+
         update() {
             // collisions for the player avatar
             this.game.physics.arcade.collide(this.player, this.platformLayer); // player collides with platform layer tiles
@@ -172,9 +181,7 @@ module PlatformerGame {
                 // for now, just make the player jump really high when they collide with a hazard
                 player.body.velocity.y = -GameState.JUMP_VELOCITY * 10;
             }, null, this);
-            this.game.physics.arcade.overlap(this.player, this.collectibles, (player: Phaser.Sprite, collectible: Phaser.Sprite) => {
-                collectible.kill();
-            }, null, this);
+            this.game.physics.arcade.overlap(this.player, this.collectibles, this.collectibleOverlapCallback, null, this);
 
             // reset the player's avatar's velocity so it won't move forever
             this.player.body.velocity.x = 0;
