@@ -14,6 +14,11 @@ module PlatformerGame {
         player: Phaser.Sprite;
         logo: Phaser.Sprite;
 
+        // sounds
+        jumpSound: Phaser.Sound;
+        collectSound: Phaser.Sound;
+        zapSound: Phaser.Sound;
+
         // keyboard cursor key controls
         cursors: Phaser.CursorKeys;
 
@@ -42,6 +47,7 @@ module PlatformerGame {
         static GRAVITY: number = 1000;
         static MOVE_VELOCITY: number = 400;
         static JUMP_VELOCITY: number = GameState.MOVE_VELOCITY + GameState.MOVE_VELOCITY * 0.55;
+        static CONTROLS_ALPHA_VALUE: number = 0.4;
 
         constructor() {
             super();
@@ -54,15 +60,26 @@ module PlatformerGame {
             // loading tilemap stuff
             this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
             this.game.load.spritesheet("tilesheet", "assets/levels/tile_spritesheet.png", 32, 32); // tile spritesheet 
+            this.game.load.spritesheet("collectibles_animations", "assets/levels/collectibles_animations.png", 32, 32);
 
             // load sprites for the onscreen controller
             this.game.load.image("aButton", "assets/controls/abutton.png");
             this.game.load.image("leftButton", "assets/controls/leftarrow.png");
             this.game.load.image("rightButton", "assets/controls/rightarrow.png");
+
+            // load sounds
+            this.game.load.audio("jump_sound", "assets/sounds/jump.wav");
+            this.game.load.audio("collect_sound", "assets/sounds/collect.wav");
+            this.game.load.audio("zap_sound", "assets/sounds/zap.wav");
         }
 
         create() {
             this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
+
+            // add sounds
+            this.jumpSound = this.game.add.audio("jump_sound");
+            this.collectSound = this.game.add.audio("collect_sound");
+            this.zapSound = this.game.add.audio("zap_sound");
 
             // setting the background color
             this.game.stage.backgroundColor = "#312341";
@@ -100,12 +117,17 @@ module PlatformerGame {
             this.collectibles.enableBody = true;
 
             // create sprites for all objects in collectibles group layer
-            this.map.createFromObjects("collectibles", 1, "tilesheet", 0, true, false, this.collectibles);
+            this.map.createFromObjects("collectibles", 1, "collectibles_animations", 0, true, false, this.collectibles);
+
+            // add animations to the collectibles
+            this.collectibles.callAll("animations.add", "animations", "hover", [0, 1, 2, 1], 5, true);
+            this.collectibles.callAll("animations.play", "animations", "hover");
 
             // add oncscreen controls to the screen, but only if touch is available
             if (this.game.device.touch) {
                 this.aButton = this.game.add.button(630, 390, "aButton", null, this);
                 this.aButton.fixedToCamera = true; // stay in one place like a UI button
+                this.aButton.alpha = GameState.CONTROLS_ALPHA_VALUE; // set transparency
                 this.aButton.events.onInputDown.add(() => {
                     this.isAButtonPressed = true;
                 });
@@ -115,6 +137,7 @@ module PlatformerGame {
 
                 this.leftButton = this.game.add.button(40, 380, "leftButton", null, this);
                 this.leftButton.fixedToCamera = true;
+                this.leftButton.alpha = GameState.CONTROLS_ALPHA_VALUE;
                 this.leftButton.events.onInputDown.add(() => {
                     this.isLeftButtonPressed = true;
                 });
@@ -124,6 +147,7 @@ module PlatformerGame {
 
                 this.rightButton = this.game.add.button(180, 380, "rightButton", null, this);
                 this.rightButton.fixedToCamera = true;
+                this.rightButton.alpha = GameState.CONTROLS_ALPHA_VALUE;
                 this.rightButton.events.onInputDown.add(() => {
                     this.isRightButtonPressed = true;
                 });
@@ -137,16 +161,33 @@ module PlatformerGame {
             this.pad1 = this.game.input.gamepad.pad1;
         }
 
+        /*
+         * checks to see if the player is on the ground, then jumps and plays jumping sound
+         */
+        makePlayerJump() {
+            if (this.player.body.onFloor()) {
+                this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
+                this.jumpSound.play();
+            }
+        }
+
+        collectibleOverlapCallback(player: Phaser.Sprite, collectible: Phaser.Sprite) {
+            // just kill the collectibles for now
+            collectible.kill();
+            this.collectSound.play();
+        }
+
+        hazardCollideCallback(player: Phaser.Sprite) {
+            // for now, just make the player jump really high when they collide with a hazard
+            player.body.velocity.y = -GameState.JUMP_VELOCITY * 10;
+            this.zapSound.play();
+        }
+
         update() {
             // collisions for the player avatar
             this.game.physics.arcade.collide(this.player, this.platformLayer); // player collides with platform layer tiles
-            this.game.physics.arcade.collide(this.player, this.hazardsLayer, (player: Phaser.Sprite) => {
-                // for now, just make the player jump really high when they collide with a hazard
-                player.body.velocity.y = -GameState.JUMP_VELOCITY * 10;
-            }, null, this);
-            this.game.physics.arcade.overlap(this.player, this.collectibles, (player: Phaser.Sprite, collectible: Phaser.Sprite) => {
-                collectible.kill();
-            }, null, this);
+            this.game.physics.arcade.collide(this.player, this.hazardsLayer, this.hazardCollideCallback, null, this);
+            this.game.physics.arcade.overlap(this.player, this.collectibles, this.collectibleOverlapCallback, null, this);
 
             // reset the player's avatar's velocity so it won't move forever
             this.player.body.velocity.x = 0;
@@ -158,8 +199,8 @@ module PlatformerGame {
             else if (this.cursors.right.isDown || this.isRightButtonPressed) {
                 this.player.body.velocity.x = GameState.MOVE_VELOCITY;
             }
-            if ((this.cursors.up.isDown || this.isAButtonPressed) && this.player.body.onFloor()) {
-                this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
+            if (this.cursors.up.isDown || this.isAButtonPressed) {
+                this.makePlayerJump();
             }
 
             // listening for gamepad controller input        
@@ -170,8 +211,8 @@ module PlatformerGame {
                 else if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
                     this.player.body.velocity.x = GameState.MOVE_VELOCITY;
                 }
-                if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A) && this.player.body.onFloor()) {
-                    this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
+                if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A)) {
+                    this.makePlayerJump();
                 }
             }
         }
