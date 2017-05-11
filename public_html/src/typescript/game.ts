@@ -17,6 +17,7 @@ module PlatformerGame {
         // sounds
         jumpSound: Phaser.Sound;
         collectSound: Phaser.Sound;
+        zapSound: Phaser.Sound;
 
         // keyboard cursor key controls
         cursors: Phaser.CursorKeys;
@@ -66,9 +67,10 @@ module PlatformerGame {
             this.game.load.image("leftButton", "assets/controls/leftarrow.png");
             this.game.load.image("rightButton", "assets/controls/rightarrow.png");
 
-            // load sound
+            // load sounds
             this.game.load.audio("jump_sound", "assets/sounds/jump.wav");
             this.game.load.audio("collect_sound", "assets/sounds/collect.wav");
+            this.game.load.audio("zap_sound", "assets/sounds/zap.wav");
         }
 
         create() {
@@ -77,6 +79,7 @@ module PlatformerGame {
             // add sounds
             this.jumpSound = this.game.add.audio("jump_sound");
             this.collectSound = this.game.add.audio("collect_sound");
+            this.zapSound = this.game.add.audio("zap_sound");
 
             // setting the background color
             this.game.stage.backgroundColor = "#312341";
@@ -174,13 +177,16 @@ module PlatformerGame {
             this.collectSound.play();
         }
 
+        hazardCollideCallback(player: Phaser.Sprite) {
+            // for now, just make the player jump really high when they collide with a hazard
+            player.body.velocity.y = -GameState.JUMP_VELOCITY * 10;
+            this.zapSound.play();
+        }
+
         update() {
             // collisions for the player avatar
             this.game.physics.arcade.collide(this.player, this.platformLayer); // player collides with platform layer tiles
-            this.game.physics.arcade.collide(this.player, this.hazardsLayer, (player: Phaser.Sprite) => {
-                // for now, just make the player jump really high when they collide with a hazard
-                player.body.velocity.y = -GameState.JUMP_VELOCITY * 10;
-            }, null, this);
+            this.game.physics.arcade.collide(this.player, this.hazardsLayer, this.hazardCollideCallback, null, this);
             this.game.physics.arcade.overlap(this.player, this.collectibles, this.collectibleOverlapCallback, null, this);
 
             // reset the player's avatar's velocity so it won't move forever
