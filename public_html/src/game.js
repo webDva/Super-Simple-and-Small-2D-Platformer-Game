@@ -67,6 +67,9 @@ var PlatformerGame;
             this.collectibles.enableBody = true;
             // create sprites for all objects in collectibles group layer
             this.map.createFromObjects("collectibles", 1, "collectibles_animations", 0, true, false, this.collectibles);
+            this.collectibles.forEach(function (child) {
+                child.anchor.setTo(0.5, 0.5); // set the anchor of all collectibles to be the center for the tween animations
+            }, this);
             // add animations to the collectibles
             this.collectibles.callAll("animations.add", "animations", "hover", [0, 1, 2, 1], 5, true);
             this.collectibles.callAll("animations.play", "animations", "hover");
@@ -114,8 +117,16 @@ var PlatformerGame;
             }
         };
         GameState.prototype.collectibleOverlapCallback = function (player, collectible) {
-            // just kill the collectibles for now
-            collectible.kill();
+            // translate and scale tweens
+            var duration = 500; // duration of the tween combination
+            this.game.add.tween(collectible).to({ y: collectible.y - 30 }, duration, null, true);
+            var lastTween = this.game.add.tween(collectible.scale).to({ x: 0, y: 0 }, duration, null, true);
+            // stop colliding now
+            collectible.body.checkCollision.none = true;
+            // kill the collectible once the tweens complete
+            lastTween.onComplete.add(function () {
+                collectible.kill();
+            }, this);
             this.collectSound.play();
         };
         GameState.prototype.hazardCollideCallback = function (player) {
