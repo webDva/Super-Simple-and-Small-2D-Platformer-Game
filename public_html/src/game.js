@@ -9,14 +9,47 @@ var __extends = (this && this.__extends) || function (d, b) {
 var PlatformerGame;
 (function (PlatformerGame) {
     /*
-     * The main game running state
+     * Boot state for only loading the loading screen
      */
-    var GameState = (function (_super) {
-        __extends(GameState, _super);
-        function GameState() {
+    var BootState = (function (_super) {
+        __extends(BootState, _super);
+        function BootState() {
             return _super.call(this) || this;
         }
-        GameState.prototype.preload = function () {
+        BootState.prototype.init = function () {
+            this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
+            // setting the background color
+            this.game.stage.backgroundColor = "#312341";
+        };
+        BootState.prototype.preload = function () {
+            this.game.load.image("loadingScreen", "assets/pantsuweb2.png");
+        };
+        BootState.prototype.create = function () {
+            this.game.state.start("PreloadState");
+        };
+        return BootState;
+    }(Phaser.State));
+    PlatformerGame.BootState = BootState;
+    /*
+     * Preload state for actually loading assets
+     */
+    var PreloadState = (function (_super) {
+        __extends(PreloadState, _super);
+        function PreloadState() {
+            return _super.call(this) || this;
+        }
+        PreloadState.prototype.preload = function () {
+            // display the loading screen image
+            var loadingScreenImage = this.game.add.image(this.game.world.centerX, this.game.world.centerY, "loadingScreen");
+            loadingScreenImage.anchor.set(0.5, 0.5);
+            loadingScreenImage.scale.set(0.3, 0.3);
+            // also display Pantsu Web brand name text
+            var textStyle = { font: "8.7em Impact, sans-serif", fill: "#ffffff", align: "center" };
+            var welcomeMessage = this.game.add.text(this.game.world.centerX, 0, "Pantsu Web", textStyle);
+            // just making the brand name text display directly below the loading screen
+            welcomeMessage.y = loadingScreenImage.y + loadingScreenImage.height / 2 + welcomeMessage.height / 2;
+            welcomeMessage.anchor.set(0.5, 0.5);
+            // now load assets
             this.game.load.image('player', 'assets/player_avatar.png');
             this.game.load.image('logo', 'assets/pantsuweb2.png');
             // loading tilemap stuff
@@ -32,15 +65,26 @@ var PlatformerGame;
             this.game.load.audio("collect_sound", "assets/sounds/collect.wav");
             this.game.load.audio("zap_sound", "assets/sounds/zap.wav");
         };
+        PreloadState.prototype.create = function () {
+            this.game.state.start("GameState");
+        };
+        return PreloadState;
+    }(Phaser.State));
+    PlatformerGame.PreloadState = PreloadState;
+    /*
+     * The main game running state
+     */
+    var GameState = (function (_super) {
+        __extends(GameState, _super);
+        function GameState() {
+            return _super.call(this) || this;
+        }
         GameState.prototype.create = function () {
             var _this = this;
-            this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
             // add sounds
             this.jumpSound = this.game.add.audio("jump_sound");
             this.collectSound = this.game.add.audio("collect_sound");
             this.zapSound = this.game.add.audio("zap_sound");
-            // setting the background color
-            this.game.stage.backgroundColor = "#312341";
             // just using arcade physics for Super Simple Platformer for now
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
             // player avatar
@@ -177,14 +221,12 @@ var PlatformerGame;
     var Game = (function () {
         function Game() {
             this.game = new Phaser.Game(800, 600, Phaser.AUTO, "phaser");
-            // add game states to the Phaser.Game
-            this.game.state.add("GameState", GameState, false);
-            /* create two new states: a boot and preloader
-             * the boot state will contain an init for the scale manager and will load the loading screen,
-             * while the preloader will display the loading screen and load assets and then start the next state
+            /* The boot state will contain an init() for the scale manager and will load the loading screen,
+             * while the preloader will display the loading screen and load assets and then start the main game state.
              */
-            // start the first state
-            this.game.state.start("GameState", true, true);
+            this.game.state.add("BootState", BootState, true);
+            this.game.state.add("PreloadState", PreloadState);
+            this.game.state.add("GameState", GameState);
         }
         return Game;
     }());
