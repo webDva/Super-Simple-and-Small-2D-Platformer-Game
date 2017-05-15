@@ -4,6 +4,76 @@
 
 module PlatformerGame {
     /*
+     * Boot state for only loading the loading screen
+     */
+    export class BootState extends Phaser.State {
+        constructor() {
+            super();
+        }
+
+        init() {
+            this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
+
+            // setting the background color
+            this.game.stage.backgroundColor = "#312341";
+        }
+
+        preload() {
+            this.game.load.image("loadingScreen", "assets/pantsuweb2.png");
+        }
+
+        create() {
+            this.game.state.start("PreloadState");
+        }
+    }
+
+    /*
+     * Preload state for actually loading assets
+     */
+    export class PreloadState extends Phaser.State {
+        constructor() {
+            super();
+        }
+
+        preload() {
+            // display the loading screen image
+            let loadingScreenImage = this.game.add.image(this.game.world.centerX, this.game.world.centerY, "loadingScreen");
+            loadingScreenImage.anchor.set(0.5, 0.5);
+            loadingScreenImage.scale.set(0.3, 0.3);
+
+            // also display Pantsu Web brand name text
+            let textStyle = {font: "8.7em Impact, sans-serif", fill: "#ffffff", align: "center"};
+            let welcomeMessage = this.game.add.text(this.game.world.centerX, 0, "Pantsu Web", textStyle);
+            // just making the brand name text display directly below the loading screen
+            welcomeMessage.y = loadingScreenImage.y + loadingScreenImage.height / 2 + welcomeMessage.height / 2;
+            welcomeMessage.anchor.set(0.5, 0.5);
+
+            // now load assets
+            this.game.load.image('player', 'assets/player_avatar.png');
+            this.game.load.image('logo', 'assets/pantsuweb2.png');
+
+            // loading tilemap stuff
+            this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
+            this.game.load.spritesheet("tilesheet", "assets/levels/tile_spritesheet.png", 32, 32); // tile spritesheet 
+            this.game.load.spritesheet("collectibles_animations", "assets/levels/collectibles_animations.png", 32, 32);
+
+            // load sprites for the onscreen controller
+            this.game.load.image("aButton", "assets/controls/abutton.png");
+            this.game.load.image("leftButton", "assets/controls/leftarrow.png");
+            this.game.load.image("rightButton", "assets/controls/rightarrow.png");
+
+            // load sounds
+            this.game.load.audio("jump_sound", "assets/sounds/jump.wav");
+            this.game.load.audio("collect_sound", "assets/sounds/collect.wav");
+            this.game.load.audio("zap_sound", "assets/sounds/zap.wav");
+        }
+
+        create() {
+            this.game.state.start("GameState");
+        }
+    }
+
+    /*
      * The main game running state
      */
     export class GameState extends Phaser.State {
@@ -53,36 +123,11 @@ module PlatformerGame {
             super();
         }
 
-        preload() {
-            this.game.load.image('player', 'assets/player_avatar.png');
-            this.game.load.image('logo', 'assets/pantsuweb2.png');
-
-            // loading tilemap stuff
-            this.game.load.tilemap("tilemap", "assets/levels/level1.json", null, Phaser.Tilemap.TILED_JSON);
-            this.game.load.spritesheet("tilesheet", "assets/levels/tile_spritesheet.png", 32, 32); // tile spritesheet 
-            this.game.load.spritesheet("collectibles_animations", "assets/levels/collectibles_animations.png", 32, 32);
-
-            // load sprites for the onscreen controller
-            this.game.load.image("aButton", "assets/controls/abutton.png");
-            this.game.load.image("leftButton", "assets/controls/leftarrow.png");
-            this.game.load.image("rightButton", "assets/controls/rightarrow.png");
-
-            // load sounds
-            this.game.load.audio("jump_sound", "assets/sounds/jump.wav");
-            this.game.load.audio("collect_sound", "assets/sounds/collect.wav");
-            this.game.load.audio("zap_sound", "assets/sounds/zap.wav");
-        }
-
         create() {
-            this.game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // will set it to RESIZE later for responsiveness
-
             // add sounds
             this.jumpSound = this.game.add.audio("jump_sound");
             this.collectSound = this.game.add.audio("collect_sound");
             this.zapSound = this.game.add.audio("zap_sound");
-
-            // setting the background color
-            this.game.stage.backgroundColor = "#312341";
 
             // just using arcade physics for Super Simple Platformer for now
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -242,15 +287,12 @@ module PlatformerGame {
         constructor() {
             this.game = new Phaser.Game(800, 600, Phaser.AUTO, "phaser");
 
-            // add game states to the Phaser.Game
-            this.game.state.add("GameState", GameState, false);
-            /* create two new states: a boot and preloader
-             * the boot state will contain an init for the scale manager and will load the loading screen,
-             * while the preloader will display the loading screen and load assets and then start the next state 
+            /* The boot state will contain an init() for the scale manager and will load the loading screen,
+             * while the preloader will display the loading screen and load assets and then start the main game state.
              */
-
-            // start the first state
-            this.game.state.start("GameState", true, true);
+            this.game.state.add("BootState", BootState, true);
+            this.game.state.add("PreloadState", PreloadState);
+            this.game.state.add("GameState", GameState);
         }
     }
 }
