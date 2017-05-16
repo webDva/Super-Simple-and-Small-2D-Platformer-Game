@@ -30,6 +30,12 @@ var PlatformerGame;
         return BootState;
     }(Phaser.State));
     PlatformerGame.BootState = BootState;
+    // enum for movement directions
+    var Direction;
+    (function (Direction) {
+        Direction[Direction["Left"] = 0] = "Left";
+        Direction[Direction["Right"] = 1] = "Right";
+    })(Direction = PlatformerGame.Direction || (PlatformerGame.Direction = {}));
     /*
      * Preload state for actually loading assets
      */
@@ -160,6 +166,17 @@ var PlatformerGame;
                 this.jumpSound.play();
             }
         };
+        /*
+         * controls player horizontal movement
+         */
+        GameState.prototype.movePlayer = function (direction) {
+            if (direction === PlatformerGame.Direction.Left) {
+                this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
+            }
+            else if (direction == PlatformerGame.Direction.Right) {
+                this.player.body.velocity.x = GameState.MOVE_VELOCITY;
+            }
+        };
         GameState.prototype.collectibleOverlapCallback = function (player, collectible) {
             // translate and scale tweens
             var duration = 500; // duration of the tween combination
@@ -187,10 +204,10 @@ var PlatformerGame;
             this.player.body.velocity.x = 0;
             // processing cursor keys or onscreen controls input to move the player avatar
             if (this.cursors.left.isDown || this.isLeftButtonPressed) {
-                this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
+                this.movePlayer(PlatformerGame.Direction.Left);
             }
             else if (this.cursors.right.isDown || this.isRightButtonPressed) {
-                this.player.body.velocity.x = GameState.MOVE_VELOCITY;
+                this.movePlayer(PlatformerGame.Direction.Right);
             }
             if (this.cursors.up.isDown || this.isAButtonPressed) {
                 this.makePlayerJump();
@@ -198,10 +215,10 @@ var PlatformerGame;
             // listening for gamepad controller input        
             if (this.game.input.gamepad.supported && this.game.input.gamepad.active && this.pad1.connected) {
                 if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
-                    this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
+                    this.movePlayer(PlatformerGame.Direction.Left);
                 }
                 else if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
-                    this.player.body.velocity.x = GameState.MOVE_VELOCITY;
+                    this.movePlayer(PlatformerGame.Direction.Right);
                 }
                 if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A)) {
                     this.makePlayerJump();
@@ -216,7 +233,7 @@ var PlatformerGame;
     GameState.GRAVITY = 1000;
     GameState.MOVE_VELOCITY = 400;
     GameState.JUMP_VELOCITY = GameState.MOVE_VELOCITY + GameState.MOVE_VELOCITY * 0.55;
-    GameState.CONTROLS_ALPHA_VALUE = 0.4;
+    GameState.CONTROLS_ALPHA_VALUE = 0.4; // transparency value for on screen controls
     PlatformerGame.GameState = GameState;
     var Game = (function () {
         function Game() {

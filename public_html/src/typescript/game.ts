@@ -27,6 +27,12 @@ module PlatformerGame {
         }
     }
 
+    // enum for movement directions
+    export enum Direction {
+        Left,
+        Right
+    }
+
     /*
      * Preload state for actually loading assets
      */
@@ -117,7 +123,7 @@ module PlatformerGame {
         static GRAVITY: number = 1000;
         static MOVE_VELOCITY: number = 400;
         static JUMP_VELOCITY: number = GameState.MOVE_VELOCITY + GameState.MOVE_VELOCITY * 0.55;
-        static CONTROLS_ALPHA_VALUE: number = 0.4;
+        static CONTROLS_ALPHA_VALUE: number = 0.4; // transparency value for on screen controls
 
         constructor() {
             super();
@@ -219,6 +225,17 @@ module PlatformerGame {
             }
         }
 
+        /*
+         * controls player horizontal movement
+         */
+        movePlayer(direction: PlatformerGame.Direction) {
+            if (direction === PlatformerGame.Direction.Left) {
+                this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
+            } else if (direction == PlatformerGame.Direction.Right) {
+                this.player.body.velocity.x = GameState.MOVE_VELOCITY;
+            }
+        }
+
         collectibleOverlapCallback(player: Phaser.Sprite, collectible: Phaser.Sprite) {
             // translate and scale tweens
             const duration = 500; // duration of the tween combination
@@ -253,10 +270,10 @@ module PlatformerGame {
 
             // processing cursor keys or onscreen controls input to move the player avatar
             if (this.cursors.left.isDown || this.isLeftButtonPressed) {
-                this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
+                this.movePlayer(PlatformerGame.Direction.Left);
             }
             else if (this.cursors.right.isDown || this.isRightButtonPressed) {
-                this.player.body.velocity.x = GameState.MOVE_VELOCITY;
+                this.movePlayer(PlatformerGame.Direction.Right);
             }
             if (this.cursors.up.isDown || this.isAButtonPressed) {
                 this.makePlayerJump();
@@ -265,10 +282,10 @@ module PlatformerGame {
             // listening for gamepad controller input        
             if (this.game.input.gamepad.supported && this.game.input.gamepad.active && this.pad1.connected) {
                 if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
-                    this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
+                    this.movePlayer(PlatformerGame.Direction.Left);
                 }
                 else if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
-                    this.player.body.velocity.x = GameState.MOVE_VELOCITY;
+                    this.movePlayer(PlatformerGame.Direction.Right);
                 }
                 if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A)) {
                     this.makePlayerJump();
