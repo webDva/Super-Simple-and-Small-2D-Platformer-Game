@@ -229,10 +229,16 @@ module PlatformerGame {
          * controls player horizontal movement
          */
         movePlayer(direction: PlatformerGame.Direction) {
+            // If the player is in mid-air, decrease their movement speed by 1/4.
+            let speedModifier = 0;
+            if (!this.player.body.onFloor()) {
+                speedModifier = 1 / 4 * GameState.MOVE_VELOCITY;
+            }
+
             if (direction === PlatformerGame.Direction.Left) {
-                this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
-            } else if (direction == PlatformerGame.Direction.Right) {
-                this.player.body.velocity.x = GameState.MOVE_VELOCITY;
+                this.player.body.velocity.x = -GameState.MOVE_VELOCITY - speedModifier;
+            } else if (direction === PlatformerGame.Direction.Right) {
+                this.player.body.velocity.x = GameState.MOVE_VELOCITY - speedModifier;
             }
         }
 

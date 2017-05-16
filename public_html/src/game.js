@@ -170,11 +170,16 @@ var PlatformerGame;
          * controls player horizontal movement
          */
         GameState.prototype.movePlayer = function (direction) {
-            if (direction === PlatformerGame.Direction.Left) {
-                this.player.body.velocity.x = -GameState.MOVE_VELOCITY;
+            // If the player is in mid-air, decrease their movement speed by 1/4.
+            var speedModifier = 0;
+            if (!this.player.body.onFloor()) {
+                speedModifier = 1 / 4 * GameState.MOVE_VELOCITY;
             }
-            else if (direction == PlatformerGame.Direction.Right) {
-                this.player.body.velocity.x = GameState.MOVE_VELOCITY;
+            if (direction === PlatformerGame.Direction.Left) {
+                this.player.body.velocity.x = -GameState.MOVE_VELOCITY - speedModifier;
+            }
+            else if (direction === PlatformerGame.Direction.Right) {
+                this.player.body.velocity.x = GameState.MOVE_VELOCITY - speedModifier;
             }
         };
         GameState.prototype.collectibleOverlapCallback = function (player, collectible) {
