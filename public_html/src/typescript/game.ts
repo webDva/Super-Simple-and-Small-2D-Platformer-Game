@@ -71,7 +71,7 @@ module PlatformerGame {
             // load sounds
             this.game.load.audio("jump_sound", "assets/sounds/jump.wav");
             this.game.load.audio("collect_sound", "assets/sounds/collect.wav");
-            this.game.load.audio("zap_sound", "assets/sounds/zap.wav");
+            this.game.load.audio("hazard_sound", "assets/sounds/hazard.wav");
         }
 
         create() {
@@ -93,7 +93,7 @@ module PlatformerGame {
         // sounds
         jumpSound: Phaser.Sound;
         collectSound: Phaser.Sound;
-        zapSound: Phaser.Sound;
+        hazardSound: Phaser.Sound;
 
         // keyboard cursor key controls
         cursors: Phaser.CursorKeys;
@@ -133,7 +133,7 @@ module PlatformerGame {
             // add sounds
             this.jumpSound = this.game.add.audio("jump_sound");
             this.collectSound = this.game.add.audio("collect_sound");
-            this.zapSound = this.game.add.audio("zap_sound");
+            this.hazardSound = this.game.add.audio("hazard_sound");
 
             // just using arcade physics for Super Simple Platformer for now
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -219,6 +219,12 @@ module PlatformerGame {
          * checks to see if the player is on the ground, then jumps and plays jumping sound
          */
         makePlayerJump() {
+            // The player's avatar's physics body will be disabled if they touch the lava hazards, so stop
+            // controlling their movement if they're dead.
+            if (!this.player.body.enable) {
+                return;
+            }
+
             if (this.player.body.onFloor()) {
                 this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
                 this.jumpSound.play();
@@ -229,6 +235,10 @@ module PlatformerGame {
          * controls player horizontal movement
          */
         movePlayer(direction: PlatformerGame.Direction) {
+            if (!this.player.body.enable) {
+                return;
+            }
+
             // If the player is in mid-air, decrease their movement speed by 1/4.
             let speedModifier = 0;
             if (!this.player.body.onFloor()) {
@@ -259,10 +269,22 @@ module PlatformerGame {
             this.collectSound.play();
         }
 
+        /*
+         * Kills the player and restarts the GameState
+         */
         hazardCollideCallback(player: Phaser.Sprite) {
-            // for now, just make the player jump really high when they collide with a hazard
-            player.body.velocity.y = -GameState.JUMP_VELOCITY * 10;
-            this.zapSound.play();
+            // disable the player's avatar's physics body
+            player.body.enable = false;
+            this.hazardSound.play();
+
+            // Make player avatar rotate, scale, and alpha fade, then restart the GameState           
+            const duration = 1750;
+            this.game.add.tween(player).to({angle: player.angle + 360 * 5}, duration, null, true);
+            this.game.add.tween(player.scale).to({x: 0, y: 0}, duration, null, true);
+            this.game.add.tween(player).to({alpha: 0}, duration, null, true)
+                .onComplete.add(() => {
+                    this.game.state.start("GameState");
+                }, this);
         }
 
         update() {
