@@ -28,9 +28,10 @@ module PlatformerGame {
     }
 
     // enum for movement directions
-    export enum Direction {
+    export enum Movement {
         Left,
-        Right
+        Right,
+        Jump
     }
 
     /*
@@ -216,39 +217,31 @@ module PlatformerGame {
         }
 
         /*
-         * checks to see if the player is on the ground, then jumps and plays jumping sound
+         * controls player horizontal movement
          */
-        makePlayerJump() {
+        movePlayer(direction: PlatformerGame.Movement) {
             // The player's avatar's physics body will be disabled if they touch the lava hazards, so stop
             // controlling their movement if they're dead.
             if (!this.player.body.enable) {
                 return;
             }
 
-            if (this.player.body.onFloor()) {
-                this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
-                this.jumpSound.play();
-            }
-        }
-
-        /*
-         * controls player horizontal movement
-         */
-        movePlayer(direction: PlatformerGame.Direction) {
-            if (!this.player.body.enable) {
-                return;
-            }
-
-            // If the player is in mid-air, decrease their movement speed by 1/4.
+            // If the player is in mid-air, decrease their movement speed by 10%.
             let speedModifier = 0;
             if (!this.player.body.onFloor()) {
-                speedModifier = 1 / 4 * GameState.MOVE_VELOCITY;
+                speedModifier = 0.10 * GameState.MOVE_VELOCITY;
             }
 
-            if (direction === PlatformerGame.Direction.Left) {
+            if (direction === PlatformerGame.Movement.Left) {
                 this.player.body.velocity.x = -GameState.MOVE_VELOCITY - speedModifier;
-            } else if (direction === PlatformerGame.Direction.Right) {
+            } else if (direction === PlatformerGame.Movement.Right) {
                 this.player.body.velocity.x = GameState.MOVE_VELOCITY - speedModifier;
+            } else if (direction === PlatformerGame.Movement.Jump) {
+                // checks to see if the player is on the ground, then jumps and plays jumping sound
+                if (this.player.body.onFloor()) {
+                    this.player.body.velocity.y = -GameState.JUMP_VELOCITY;
+                    this.jumpSound.play();
+                }
             }
         }
 
@@ -298,25 +291,25 @@ module PlatformerGame {
 
             // processing cursor keys or onscreen controls input to move the player avatar
             if (this.cursors.left.isDown || this.isLeftButtonPressed) {
-                this.movePlayer(PlatformerGame.Direction.Left);
+                this.movePlayer(PlatformerGame.Movement.Left);
             }
             else if (this.cursors.right.isDown || this.isRightButtonPressed) {
-                this.movePlayer(PlatformerGame.Direction.Right);
+                this.movePlayer(PlatformerGame.Movement.Right);
             }
             if (this.cursors.up.isDown || this.isAButtonPressed) {
-                this.makePlayerJump();
+                this.movePlayer(PlatformerGame.Movement.Jump);
             }
 
             // listening for gamepad controller input        
             if (this.game.input.gamepad.supported && this.game.input.gamepad.active && this.pad1.connected) {
                 if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_LEFT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) < -0.1) {
-                    this.movePlayer(PlatformerGame.Direction.Left);
+                    this.movePlayer(PlatformerGame.Movement.Left);
                 }
                 else if (this.pad1.isDown(Phaser.Gamepad.XBOX360_DPAD_RIGHT) || this.pad1.axis(Phaser.Gamepad.XBOX360_STICK_LEFT_X) > 0.1) {
-                    this.movePlayer(PlatformerGame.Direction.Right);
+                    this.movePlayer(PlatformerGame.Movement.Right);
                 }
                 if (this.pad1.isDown(Phaser.Gamepad.XBOX360_A)) {
-                    this.makePlayerJump();
+                    this.movePlayer(PlatformerGame.Movement.Jump);
                 }
             }
         }
