@@ -73,6 +73,7 @@ module PlatformerGame {
             this.game.load.audio("jump_sound", "assets/sounds/jump.wav");
             this.game.load.audio("collect_sound", "assets/sounds/collect.wav");
             this.game.load.audio("hazard_sound", "assets/sounds/hazard.wav");
+            this.game.load.audio("win_song_sound", "assets/sounds/win.wav");
         }
 
         create() {
@@ -95,6 +96,7 @@ module PlatformerGame {
         jumpSound: Phaser.Sound;
         collectSound: Phaser.Sound;
         hazardSound: Phaser.Sound;
+        winSongSound: Phaser.Sound;
 
         // keyboard cursor key controls
         cursors: Phaser.CursorKeys;
@@ -109,6 +111,7 @@ module PlatformerGame {
         collected: number;
         totalCollectibles: number;
         scoreText: Phaser.Text;
+        isGameWon: boolean = false; // so the game won't countionusly add the text sprite to the screen
 
         // onscreen controls sprites
         aButton: Phaser.Button;
@@ -140,6 +143,7 @@ module PlatformerGame {
             this.jumpSound = this.game.add.audio("jump_sound");
             this.collectSound = this.game.add.audio("collect_sound");
             this.hazardSound = this.game.add.audio("hazard_sound");
+            this.winSongSound = this.game.add.audio("win_song_sound");
 
             // just using arcade physics for Super Simple Platformer for now
             this.game.physics.startSystem(Phaser.Physics.ARCADE);
@@ -305,6 +309,21 @@ module PlatformerGame {
             this.game.physics.arcade.collide(this.player, this.platformLayer); // player collides with platform layer tiles
             this.game.physics.arcade.collide(this.player, this.hazardsLayer, this.hazardCollideCallback, null, this);
             this.game.physics.arcade.overlap(this.player, this.collectibles, this.collectibleOverlapCallback, null, this);
+
+            // Display a victory/win message if the player collects all collectibles, and that's it!
+            if (this.collected === this.totalCollectibles) {
+                if (!this.isGameWon) {
+                    this.isGameWon = true;
+
+                    let textStyle = {font: "8em Impact, sans-serif", fill: "#9d00ff", align: "center"};
+                    let winText = this.game.add.text(this.game.camera.width / 2, this.game.camera.height / 2, "You win!", textStyle);
+                    winText.anchor.setTo(0.5, 0.5);
+                    winText.fixedToCamera = true;
+                    winText.alpha = 0.90;
+
+                    this.winSongSound.play();
+                }
+            }
 
             // reset the player's avatar's velocity so it won't move forever
             this.player.body.velocity.x = 0;
