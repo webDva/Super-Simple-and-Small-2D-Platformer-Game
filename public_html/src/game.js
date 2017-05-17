@@ -100,7 +100,7 @@ var PlatformerGame;
             this.player.body.bounce.y = 0.2;
             this.player.body.gravity.y = GameState.GRAVITY;
             this.player.body.collideWorldBounds = true;
-            this.player.body.tilePadding = new Phaser.Point(8.5, 8.5); // Extra padding so the player won't skip over tilemap collisions
+            this.player.body.tilePadding = new Phaser.Point(130, 130); // Extra padding so the player won't skip over tilemap collisions
             this.game.camera.follow(this.player); // make camera follow player
             // add cursor keys controls
             this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -253,8 +253,8 @@ var PlatformerGame;
     }(Phaser.State));
     // CONSTANTS
     GameState.GRAVITY = 1000;
-    GameState.MOVE_VELOCITY = 400;
-    GameState.JUMP_VELOCITY = GameState.MOVE_VELOCITY + GameState.MOVE_VELOCITY * 0.55;
+    GameState.MOVE_VELOCITY = 365;
+    GameState.JUMP_VELOCITY = GameState.MOVE_VELOCITY + GameState.MOVE_VELOCITY * 0.38;
     GameState.CONTROLS_ALPHA_VALUE = 0.4; // transparency value for on screen controls
     PlatformerGame.GameState = GameState;
     var Game = (function () {

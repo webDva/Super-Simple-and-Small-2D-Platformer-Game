@@ -122,8 +122,8 @@ module PlatformerGame {
 
         // CONSTANTS
         static GRAVITY: number = 1000;
-        static MOVE_VELOCITY: number = 400;
-        static JUMP_VELOCITY: number = GameState.MOVE_VELOCITY + GameState.MOVE_VELOCITY * 0.55;
+        static MOVE_VELOCITY: number = 365;
+        static JUMP_VELOCITY: number = GameState.MOVE_VELOCITY + GameState.MOVE_VELOCITY * 0.38;
         static CONTROLS_ALPHA_VALUE: number = 0.4; // transparency value for on screen controls
 
         constructor() {
@@ -145,7 +145,7 @@ module PlatformerGame {
             this.player.body.bounce.y = 0.2;
             this.player.body.gravity.y = GameState.GRAVITY;
             this.player.body.collideWorldBounds = true;
-            this.player.body.tilePadding = new Phaser.Point(8.5, 8.5); // Extra padding so the player won't skip over tilemap collisions
+            this.player.body.tilePadding = new Phaser.Point(130, 130); // Extra padding so the player won't skip over tilemap collisions
             this.game.camera.follow(this.player); // make camera follow player
 
             // add cursor keys controls
