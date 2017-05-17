@@ -105,6 +105,11 @@ module PlatformerGame {
         hazardsLayer: Phaser.TilemapLayer;
         collectibles: Phaser.Group;
 
+        // collectibles counters
+        collected: number;
+        totalCollectibles: number;
+        scoreText: Phaser.Text;
+
         // onscreen controls sprites
         aButton: Phaser.Button;
         bButton: Phaser.Button;
@@ -178,6 +183,16 @@ module PlatformerGame {
             // add animations to the collectibles
             this.collectibles.callAll("animations.add", "animations", "hover", [0, 1, 2, 1], 5, true);
             this.collectibles.callAll("animations.play", "animations", "hover");
+
+            // create counters for collectibles
+            this.totalCollectibles = this.collectibles.length;
+            this.collected = 0;
+
+            // display text for collected and total collectibles
+            let textStyle = {font: "4em Impact, sans-serif", fill: "#ffd133", align: "center"};
+            this.scoreText = this.game.add.text(this.game.width, 0, this.collected + "/" + this.totalCollectibles, textStyle);
+            this.scoreText.anchor.setTo(1, 0);
+            this.scoreText.fixedToCamera = true;
 
             // add oncscreen controls to the screen, but only if touch is available
             if (this.game.device.touch) {
@@ -261,6 +276,10 @@ module PlatformerGame {
             }, this);
 
             this.collectSound.play();
+
+            // update collected collectibles counter
+            this.collected++;
+            this.scoreText.text = this.collected + "/" + this.totalCollectibles;
         }
 
         /*
@@ -313,10 +332,6 @@ module PlatformerGame {
                     this.movePlayer(PlatformerGame.Movement.Jump);
                 }
             }
-        }
-
-        render() {
-
         }
     }
 
