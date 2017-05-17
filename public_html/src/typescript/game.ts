@@ -145,6 +145,7 @@ module PlatformerGame {
             this.player.body.bounce.y = 0.2;
             this.player.body.gravity.y = GameState.GRAVITY;
             this.player.body.collideWorldBounds = true;
+            this.player.body.tilePadding = new Phaser.Point(8.5, 8.5); // Extra padding so the player won't skip over tilemap collisions
             this.game.camera.follow(this.player); // make camera follow player
 
             // add cursor keys controls
