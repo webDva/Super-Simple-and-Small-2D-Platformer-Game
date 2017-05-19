@@ -106,6 +106,14 @@ var PlatformerGame;
             this.player.body.collideWorldBounds = true;
             this.player.body.tilePadding = new Phaser.Point(130, 130); // Extra padding so the player won't skip over tilemap collisions
             this.game.camera.follow(this.player); // make camera follow player
+            // If the player goes through the tiles touching the bottom world bounds, restart the GameState
+            this.player.body.onWorldBounds = new Phaser.Signal();
+            this.player.body.onWorldBounds.add(function (sprite, up, down, left, right) {
+                if (down) {
+                    _this.hazardSound.play();
+                    _this.game.state.start("GameState");
+                }
+            }, this);
             // add cursor keys controls
             this.cursors = this.game.input.keyboard.createCursorKeys();
             // add tiled map
